@@ -19,3 +19,12 @@ model Usuario{
   email String @unique
   senha String
 }
+
+model Livros{
+  id Int @id @default(autoincrement())
+  nome  String
+  categoria String
+  autor String
+  sinopse String
+  editora String
+}

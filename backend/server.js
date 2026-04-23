@@ -6,6 +6,8 @@ import Usuario from "./models/Usuario.js";
 import { PrismaClient } from '@prisma/client';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import Livros from "./models/Livros.js";
+import { data } from "react-router-dom";
 
 
 
@@ -13,6 +15,7 @@ const app = express();
 const prisma = new PrismaClient();
 
 app.use(express.json());
+
 
 app.post("/user", async (req, res) => {
     try {
@@ -33,7 +36,6 @@ app.post("/user", async (req, res) => {
 });
 
 app.get("/user/", autenticar, async (req, res) => {
-    const id = req.params.id;
     try {
         const usuario = await prisma.usuario.findMany({
         });
@@ -108,6 +110,96 @@ app.post("/login", async (req, res) => {
         return res.status(500).json(err)
     }
 });
+
+app.post("/livros", autenticar, async (req, res) => {
+
+    try {
+        const { nome, categoria, autor, sinopse, editora } = req.body;
+
+        const livro = new Livros(nome, categoria, autor, sinopse, editora);
+
+        const novoLivro = await prisma.livros.create({
+            data: livro
+        });
+
+        res.status(201).json(novoLivro);
+
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get("/livros/:id", autenticar, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const livro = await prisma.livros.findUnique({
+            where: { id }
+        });
+
+
+        if (!livro) {
+            return res.status(404).json({
+                messagem: "Livro não encontrado"
+            })
+        }
+        res.status(200).json(livro);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get("/livros/", autenticar, async (req, res) => {
+    try {
+        const livro = await prisma.livros.findMany({
+        });
+
+        if (!livro) {
+            return res.status(404).json({
+                messagem: "Livro não encontrado"
+            })
+        }
+        res.status(200).json(livro);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.delete("/livros/:id", autenticar, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const livro = await prisma.livros.delete({
+            where: { id }
+        });
+        res.status(200).json(livro);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.put("/livros/:id", autenticar, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        const { nome, categoria, autor, sinopse, editora } = req.body;
+        const livro = new Livros(nome, categoria, autor, sinopse, editora);
+
+        const livroUpdate = await prisma.livros.update({
+            where: {
+                id: id
+            },
+            data: livro
+        });
+
+        if (!livro) {
+            return res.status(404).json({
+                messagem: "Livro não encontrado"
+            })
+        }
+        res.status(200).json(livro);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 function autenticar(req, res, next) {
     const authHeader = req.headers.authorization;
