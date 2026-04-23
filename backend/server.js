@@ -23,14 +23,44 @@ app.post("/user", async (req, res) => {
     }
 });
 
-app.get("/user", async (req, res) => {
+app.get("/user/", async (req, res) => {
+    const id = req.params.id;
     try {
-        const usuarios = await prisma.usuario.findMany();
+        const usuario = await prisma.usuario.findMany({
+        });
 
-        res.status(201).json(usuarios);
+        if (usuario.length === 0) {
+            return res.status(404).json({
+                messagem: "Usuários não encontrados"
+            })
+        }
+        res.status(200).json(usuario);
     } catch (err) {
         res.status(500).json(err);
     }
-})
+});
+
+
+app.get("/user/:id", async (req, res) => {
+
+    try {
+        const id = Number(req.params.id);
+        const usuario = await prisma.usuario.findUnique({
+            where: { id }
+        });
+
+
+        if (!usuario) {
+            return res.status(404).json({
+                messagem: "Usuário não encontrado"
+            })
+        }
+        res.status(200).json(usuario);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+
 
 app.listen(3000, () => console.log("O servidor está rodando!! porta: 3000"));
