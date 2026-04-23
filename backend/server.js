@@ -122,7 +122,7 @@ app.post("/livros", autenticar, async (req, res) => {
             data: livro
         });
 
-        res.status(201).json(novoLivro);
+        res.status(201).json();
 
     } catch (err) {
         res.status(500).json(err);
@@ -170,7 +170,7 @@ app.delete("/livros/:id", autenticar, async (req, res) => {
         const livro = await prisma.livros.delete({
             where: { id }
         });
-        res.status(200).json(livro);
+        res.status(200).json();
     } catch (err) {
         res.status(500).json(err);
     }
@@ -195,7 +195,7 @@ app.put("/livros/:id", autenticar, async (req, res) => {
                 messagem: "Livro não encontrado"
             })
         }
-        res.status(200).json(livro);
+        res.status(201).json();
     } catch (err) {
         res.status(500).json(err);
     }
