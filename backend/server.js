@@ -8,12 +8,14 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Livros from "./models/Livros.js";
 import { data } from "react-router-dom";
+import cors from "cors";
 
 
 
 const app = express();
 const prisma = new PrismaClient();
 
+app.use(cors());
 app.use(express.json());
 
 
